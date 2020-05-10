@@ -2,6 +2,7 @@ package com.ft.familyTree.dto;
 
 public class MemberAddress {
 
+	private String addressId;
 	private String doorNumber;
 	private String houseName;
 	private String streetName;
@@ -13,9 +14,10 @@ public class MemberAddress {
 	private String country;
 	private String pinCode;
 	
-	public MemberAddress(String doorNumber, String houseName, String streetName, String laneNumber, String area, String landMark,
+	public MemberAddress(String addressId, String doorNumber, String houseName, String streetName, String laneNumber, String area, String landMark,
 			String city, String state, String country, String pinCode) {
 		super();
+		this.addressId = addressId;
 		this.doorNumber = doorNumber;
 		this.houseName = houseName;
 		this.streetName = streetName;
@@ -87,11 +89,17 @@ public class MemberAddress {
 	public void setArea(String area) {
 		this.area = area;
 	}
+	public String getAddressId() {
+		return addressId;
+	}
+	public void setAddressId(String addressId) {
+		this.addressId = addressId;
+	}
 	@Override
 	public String toString() {
-		return "MemberAddress [doorNumber=" + doorNumber + ", houseName=" + houseName + ", streetName=" + streetName
-				+ ", laneNumber=" + laneNumber + ", landMark=" + landMark + ", area=" + area + ", city=" + city
-				+ ", state=" + state + ", country=" + country + ", pinCode=" + pinCode + "]";
+		return "MemberAddress [addressId=" + addressId + ", doorNumber=" + doorNumber + ", houseName=" + houseName
+				+ ", streetName=" + streetName + ", laneNumber=" + laneNumber + ", landMark=" + landMark + ", area="
+				+ area + ", city=" + city + ", state=" + state + ", country=" + country + ", pinCode=" + pinCode + "]";
 	}
 	
 }

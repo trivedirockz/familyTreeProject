@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,9 +16,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.ft.com.ft.familyTree.exception.FTApplicationException;
+import com.ft.familyTree.dto.CommonResponseDTO;
 import com.ft.familyTree.dto.Constants;
 import com.ft.familyTree.dto.Member;
+import com.ft.familyTree.exception.UserNotFoundException;
 import com.ft.familyTree.service.MemberService;
 
 @RestController
@@ -30,18 +30,34 @@ public class FamilyMembersController {
 	MemberService memberService;
 
 	@GetMapping(path="/getMember/{memberId}")
-	public Member getMember(@PathVariable(name="memberId") int pMemberId) {
+	public @ResponseBody CommonResponseDTO getMember(@PathVariable(name="memberId") int pMemberId) {
+		CommonResponseDTO response = new CommonResponseDTO();
 		Member member = memberService.fetchMember(pMemberId);
 		if (member == null) {
-			throw new FTApplicationException(Constants.MEMBER_NOT_FOUND_EXCEPTION + " for the member Id :"+ pMemberId);
+			response.setSuccess(Boolean.FALSE);
+			response.setError(Constants.MEMBER_NOT_FOUND_EXCEPTION + " for the member Id :"+ pMemberId);
+			response.setStatusCode(HttpStatus.NOT_FOUND.toString());
+			throw new UserNotFoundException(Constants.MEMBER_NOT_FOUND_EXCEPTION + " for the member Id :"+ pMemberId);
+		} else {
+			response.setSuccess(Boolean.TRUE);
+			response.setMember(member);
 		}
-		return member;
+		return response;
 	}
 	
 	@GetMapping(path="/getAllMembers")
-	public List<Member> fetchAllMembers() {
-		List<Member> members = memberService.fetchAllMembers();
-		return members;
+	public @ResponseBody ResponseEntity<Object> getAllMembers() {
+		CommonResponseDTO response = new CommonResponseDTO();
+		Optional<List<Member>> members = memberService.fetchAllMembers();
+		if(!members.get().isEmpty()) {
+			response.setMembersList(members.get());
+			response.setSuccess(Boolean.TRUE);
+		} else {
+			response.setSuccess(Boolean.FALSE);
+			response.setError("No members found");
+			response.setStatusCode(HttpStatus.NOT_FOUND.toString());
+		}
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 	}
 	
 	@PostMapping(path="/addNewMember")
@@ -52,4 +68,5 @@ public class FamilyMembersController {
 		URI loc = URI.create(location);
 		return ResponseEntity.created(loc).body(createdMember.get());
 	}
+	
 }
