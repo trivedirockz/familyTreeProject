@@ -8,7 +8,7 @@ public class CommonResponseDTO extends BaseResponseDTO {
 	
 	private Member member;
 	private List<Member> membersList;
-	private ResponseEntity<Object> newMember;
+	private ResponseEntity<Object> responseEntity;
 	public Member getMember() {
 		return member;
 	}
@@ -21,11 +21,12 @@ public class CommonResponseDTO extends BaseResponseDTO {
 	public void setMembersList(List<Member> membersList) {
 		this.membersList = membersList;
 	}
-	public ResponseEntity<Object> getNewMember() {
-		return newMember;
+	public ResponseEntity<Object> getResponseEntity() {
+		return responseEntity;
 	}
-	public void setNewMember(ResponseEntity<Object> newMember) {
-		this.newMember = newMember;
+	public void setResponseEntity(ResponseEntity<Object> responseEntity) {
+		this.responseEntity = responseEntity;
 	}
+	
 
 }

@@ -2,12 +2,18 @@ package com.ft.familyTree.dto;
 
 import java.time.LocalDate;
 
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Size;
+
 public class Member {
 
 	private Integer memberId;
+	@Size(min = 2, message = "First Name should atleast contain 2 characters")
 	private String firstName;
 	private String middleName;
+	@Size(min = 2)
 	private String lastName;
+	@Past
 	private LocalDate dateOfBirth;
 	private String occupation;
 	private MemberAddress permanentAddress;

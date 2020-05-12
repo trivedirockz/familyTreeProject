@@ -4,9 +4,12 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,21 +55,34 @@ public class FamilyMembersController {
 		if(!members.get().isEmpty()) {
 			response.setMembersList(members.get());
 			response.setSuccess(Boolean.TRUE);
+			return ResponseEntity.status(HttpStatus.OK).body(response);
 		} else {
 			response.setSuccess(Boolean.FALSE);
 			response.setError("No members found");
 			response.setStatusCode(HttpStatus.NOT_FOUND.toString());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 	}
 	
-	@PostMapping(path="/addNewMember")
-	public @ResponseBody ResponseEntity<Object> addNewMember(@RequestBody Member pMember) {
-		Optional<Member> createdMember = memberService.addMember(pMember);
+	@PostMapping(path="/registerMember")
+	public @ResponseBody ResponseEntity<Object> registerMember(@Valid @RequestBody Member pMember) {
+		Optional<Member> createdMember = memberService.registerMember(pMember);
 		String location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{memberId}").buildAndExpand(createdMember.get().getMemberId())
 				.toUri().toString().replaceAll("/addNewMember", "/getMember");
 		URI loc = URI.create(location);
 		return ResponseEntity.created(loc).body(createdMember.get());
+	}
+	
+	@DeleteMapping(path="/removeMember/{pMemberId}")
+	public @ResponseBody CommonResponseDTO removeMember(@PathVariable int pMemberId) {
+		CommonResponseDTO response = new CommonResponseDTO();
+		boolean memberRemoved = memberService.removeMember(pMemberId);
+		if(memberRemoved) {
+			response.setSuccess(Boolean.TRUE);
+		} else {
+			throw new UserNotFoundException("MemberNotFound for the id :" + pMemberId);
+		}
+		return response;
 	}
 	
 }
