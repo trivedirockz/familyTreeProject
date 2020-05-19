@@ -1,105 +1,174 @@
 package com.ft.familyTree.dto;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+@Entity
+@Table(name = "ftp_address")
 public class MemberAddress {
 
-	private String addressId;
-	private String doorNumber;
-	private String houseName;
-	private String streetName;
-	private String laneNumber;
+	@Id
+	@SequenceGenerator(name="seq-gen",sequenceName="ftp_address_id_sequence", allocationSize=1)
+	@GeneratedValue(strategy= GenerationType.SEQUENCE, generator="seq-gen")
+	@Column(name = "address_id")
+	private Integer addressId;
+	
+	@NotNull
+	@Column(name = "address_line_one")
+	private String addressLineOne;
+	
+	@Column(name = "address_line_two")
+	private String addressLineTwo;
+	
+	@Column(name = "land_mark")
 	private String landMark;
-	private String area;
+	
+	@NotNull
+	@Column(name = "city")
 	private String city;
+	
+	@NotNull
+	@Column(name = "state")
 	private String state;
+	
+	@NotNull
+	@Column(name = "country")
 	private String country;
+	
+	@NotNull
+	@Column(name = "pincode")
 	private String pinCode;
 	
-	public MemberAddress(String addressId, String doorNumber, String houseName, String streetName, String laneNumber, String area, String landMark,
-			String city, String state, String country, String pinCode) {
+	@Column(name = "is_primary")
+	private boolean isPrimary;
+	
+	@JsonIgnore
+	@Column(name = "member_id")
+	private Integer memberId;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JsonIgnore
+	private Member member;
+
+	public MemberAddress(Integer addressId, String addressLineOne, String addressLineTwo, String landMark, String city,
+			String state, String country, String pinCode, boolean isPrimary) {
 		super();
 		this.addressId = addressId;
-		this.doorNumber = doorNumber;
-		this.houseName = houseName;
-		this.streetName = streetName;
-		this.laneNumber = laneNumber;
+		this.addressLineOne = addressLineOne;
+		this.addressLineTwo = addressLineTwo;
 		this.landMark = landMark;
-		this.area = area;
 		this.city = city;
 		this.state = state;
 		this.country = country;
 		this.pinCode = pinCode;
+		this.isPrimary = isPrimary;
 	}
-	public String getDoorNumber() {
-		return doorNumber;
+
+	public MemberAddress() {
 	}
-	public void setDoorNumber(String doorNumber) {
-		this.doorNumber = doorNumber;
+
+	public Integer getAddressId() {
+		return addressId;
 	}
-	public String getHouseName() {
-		return houseName;
+
+	public void setAddressId(Integer addressId) {
+		this.addressId = addressId;
 	}
-	public void setHouseName(String houseName) {
-		this.houseName = houseName;
+
+	public String getAddressLineOne() {
+		return addressLineOne;
 	}
-	public String getStreetName() {
-		return streetName;
+
+	public void setAddressLineOne(String addressLineOne) {
+		this.addressLineOne = addressLineOne;
 	}
-	public void setStreetName(String streetName) {
-		this.streetName = streetName;
+
+	public String getAddressLineTwo() {
+		return addressLineTwo;
 	}
-	public String getLaneNumber() {
-		return laneNumber;
+
+	public void setAddressLineTwo(String addressLineTwo) {
+		this.addressLineTwo = addressLineTwo;
 	}
-	public void setLaneNumber(String laneNumber) {
-		this.laneNumber = laneNumber;
-	}
+
 	public String getLandMark() {
 		return landMark;
 	}
+
 	public void setLandMark(String landMark) {
 		this.landMark = landMark;
 	}
+
 	public String getCity() {
 		return city;
 	}
+
 	public void setCity(String city) {
 		this.city = city;
 	}
+
 	public String getState() {
 		return state;
 	}
+
 	public void setState(String state) {
 		this.state = state;
 	}
+
 	public String getCountry() {
 		return country;
 	}
+
 	public void setCountry(String country) {
 		this.country = country;
 	}
+
 	public String getPinCode() {
 		return pinCode;
 	}
+
 	public void setPinCode(String pinCode) {
 		this.pinCode = pinCode;
 	}
-	public String getArea() {
-		return area;
+
+	public boolean isPrimary() {
+		return isPrimary;
 	}
-	public void setArea(String area) {
-		this.area = area;
+
+	public void setPrimary(boolean isPrimary) {
+		this.isPrimary = isPrimary;
 	}
-	public String getAddressId() {
-		return addressId;
+
+	public Member getMember() {
+		return member;
 	}
-	public void setAddressId(String addressId) {
-		this.addressId = addressId;
+
+	public void setMember(Member member) {
+		this.member = member;
 	}
-	@Override
-	public String toString() {
-		return "MemberAddress [addressId=" + addressId + ", doorNumber=" + doorNumber + ", houseName=" + houseName
-				+ ", streetName=" + streetName + ", laneNumber=" + laneNumber + ", landMark=" + landMark + ", area="
-				+ area + ", city=" + city + ", state=" + state + ", country=" + country + ", pinCode=" + pinCode + "]";
+
+	public Integer getMemberId() {
+		return memberId;
+	}
+
+	public void setMemberId(Integer memberId) {
+		this.memberId = memberId;
 	}
 	
+	@Override
+	public String toString() {
+		return "MemberAddress [addressId=" + addressId + ", addressLineOne=" + addressLineOne + ", addressLineTwo="
+				+ addressLineTwo + ", landMark=" + landMark + ", city=" + city + ", state=" + state + ", country="
+				+ country + ", pinCode=" + pinCode + ", isPrimary=" + isPrimary + "]";
+	}
 }

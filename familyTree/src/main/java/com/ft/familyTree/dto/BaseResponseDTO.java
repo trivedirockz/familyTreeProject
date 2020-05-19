@@ -9,6 +9,14 @@ public class BaseResponseDTO {
 	private boolean success;
 	private String error;
 	private String statusCode;
+	public BaseResponseDTO() {
+	}
+	public BaseResponseDTO(boolean success, String error, String statusCode) {
+		super();
+		this.success = success;
+		this.error = error;
+		this.statusCode = statusCode;
+	}
 	public boolean isSuccess() {
 		return success;
 	}

@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -20,50 +22,63 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.ft.familyTree.dto.CommonResponseDTO;
-import com.ft.familyTree.dto.Constants;
 import com.ft.familyTree.dto.Member;
-import com.ft.familyTree.exception.UserNotFoundException;
+import com.ft.familyTree.exception.NotFoundException;
 import com.ft.familyTree.service.MemberService;
 
 @RestController
-@RequestMapping("/api/v2")
+@RequestMapping("/api/v2/manageMember")
 public class FamilyMembersController {
+	
+	private Logger vlog;
 	
 	@Autowired
 	MemberService memberService;
-
+	
+	/**
+	 * This method will fetch the member details based on memberId.
+	 * @param pMemberId - pMemberId.
+	 * @return CommonResponseDTO - CommonResponseDTO.
+	 */
 	@GetMapping(path="/getMember/{memberId}")
 	public @ResponseBody CommonResponseDTO getMember(@PathVariable(name="memberId") int pMemberId) {
-		CommonResponseDTO response = new CommonResponseDTO();
+		vlog.debug("FamilyMembersController.getMember() :: START");
+		CommonResponseDTO response = new CommonResponseDTO(Boolean.FALSE, "Member not found for with id : "+pMemberId, HttpStatus.NOT_FOUND.toString());
 		Member member = memberService.fetchMember(pMemberId);
-		if (member == null) {
-			response.setSuccess(Boolean.FALSE);
-			response.setError(Constants.MEMBER_NOT_FOUND_EXCEPTION + " for the member Id :"+ pMemberId);
-			response.setStatusCode(HttpStatus.NOT_FOUND.toString());
-			throw new UserNotFoundException(Constants.MEMBER_NOT_FOUND_EXCEPTION + " for the member Id :"+ pMemberId);
-		} else {
+		Optional.of(member).ifPresent(y -> {
 			response.setSuccess(Boolean.TRUE);
+			response.setError(null);
 			response.setMember(member);
-		}
+			response.setStatusCode(HttpStatus.CREATED.toString());
+		});
+		vlog.debug("FamilyMembersController.getMember() :: END");
 		return response;
 	}
 	
+	/**
+	 * This method will fetch all members registered.
+	 * @return CommonResponseDTO - CommonResponseDTO.
+	 */
 	@GetMapping(path="/getAllMembers")
-	public @ResponseBody ResponseEntity<Object> getAllMembers() {
-		CommonResponseDTO response = new CommonResponseDTO();
+	public @ResponseBody CommonResponseDTO getAllMembers() {
+		vlog.debug("FamilyMembersController.getAllMembers() :: START");
+		CommonResponseDTO response = new CommonResponseDTO(Boolean.FALSE, "No data found", HttpStatus.NOT_FOUND.toString());
 		Optional<List<Member>> members = memberService.fetchAllMembers();
-		if(!members.get().isEmpty()) {
+		members.ifPresent(y -> {
 			response.setMembersList(members.get());
 			response.setSuccess(Boolean.TRUE);
-			return ResponseEntity.status(HttpStatus.OK).body(response);
-		} else {
-			response.setSuccess(Boolean.FALSE);
-			response.setError("No members found");
-			response.setStatusCode(HttpStatus.NOT_FOUND.toString());
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-		}
+			response.setError(null);
+			response.setStatusCode(HttpStatus.OK.toString());
+		});
+		vlog.debug("FamilyMembersController.getAllMembers() :: END");
+		return response;
 	}
 	
+	/**
+	 * This method registers a new member.
+	 * @param pMember - pMember.
+	 * @return ResponseEntity - ResponseEntity.
+	 */
 	@PostMapping(path="/registerMember")
 	public @ResponseBody ResponseEntity<Object> registerMember(@Valid @RequestBody Member pMember) {
 		Optional<Member> createdMember = memberService.registerMember(pMember);
@@ -73,6 +88,30 @@ public class FamilyMembersController {
 		return ResponseEntity.created(loc).body(createdMember.get());
 	}
 	
+	/**
+	 * This method updates member details.
+	 * @param pMember - pMember.
+	 * @return CommonResponseDTO - CommonResponseDTO.
+	 */
+	@PutMapping(path="/updateMember")
+	public @ResponseBody CommonResponseDTO updateMember(@Valid @RequestBody Member pMember) {
+		Optional<Member> updatedMember = memberService.updateMember(pMember);
+		CommonResponseDTO response = new CommonResponseDTO(Boolean.FALSE,
+				"Delete Address failed", HttpStatus.NOT_FOUND.toString());
+		Optional.of(updatedMember).ifPresent(n -> {
+			response.setMember(n.get());
+			response.setSuccess(Boolean.TRUE);
+			response.setError(null);
+			response.setStatusCode(HttpStatus.OK.toString());
+		});
+		return response;
+	}
+	
+	/**
+	 * This method removes a member.
+	 * @param pMemberId - pMemberId.
+	 * @return CommonResponseDTO - CommonResponseDTO.
+	 */
 	@DeleteMapping(path="/removeMember/{pMemberId}")
 	public @ResponseBody CommonResponseDTO removeMember(@PathVariable int pMemberId) {
 		CommonResponseDTO response = new CommonResponseDTO();
@@ -80,7 +119,7 @@ public class FamilyMembersController {
 		if(memberRemoved) {
 			response.setSuccess(Boolean.TRUE);
 		} else {
-			throw new UserNotFoundException("MemberNotFound for the id :" + pMemberId);
+			throw new NotFoundException("MemberNotFound for the id :" + pMemberId);
 		}
 		return response;
 	}

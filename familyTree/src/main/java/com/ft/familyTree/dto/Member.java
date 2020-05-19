@@ -1,28 +1,77 @@
 package com.ft.familyTree.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+@Entity
+@Table(name = "ftp_member")
 public class Member {
 
+	@Id
+	@SequenceGenerator(name="seq-gen",sequenceName="ftp_member_id_sequence", allocationSize=1)
+	@GeneratedValue(strategy= GenerationType.SEQUENCE, generator="seq-gen")
+	@Column(name = "member_id")
 	private Integer memberId;
-	@Size(min = 2, message = "First Name should atleast contain 2 characters")
-	private String firstName;
-	private String middleName;
-	@Size(min = 2)
-	private String lastName;
-	@Past
-	private LocalDate dateOfBirth;
-	private String occupation;
-	private MemberAddress permanentAddress;
-	private MemberAddress currentAddress;
-	private boolean isCurrentAddressPermanent;
 	
-	public Member(Integer memberId, String firstName, String middleName, String lastName, LocalDate dateOfBirth,
-			String occupation, MemberAddress permanentAddress, MemberAddress currentAddress,
-			boolean isCurrentAddressPermanent) {
+	@NotNull
+	@Size(min = 2, message = "First Name should atleast contain 2 characters")
+	@Column(name = "first_name")
+	private String firstName;
+	
+	@Column(name = "middle_name")
+	private String middleName;
+	
+	@NotNull
+	@Size(min = 2)
+	@Column(name = "last_name")
+	private String lastName;
+	
+	@Past
+	@Column(name = "date_of_birth")
+	private LocalDate dateOfBirth;
+	
+	@Column(name = "occupation")
+	private String occupation;
+	
+	@Size(min = 10, max = 10, message = "Mobile number should contian exactly 10 digits")
+	@Column(name = "mobile_number")
+	private String mobileNumber;
+	
+	@Email(message = "Email should be valid")
+	@Column(name = "email")
+	private String email;
+	
+	@Size(min = 4, message = "Password should contain minimum 4 characters")
+	@Column(name = "password")
+	@JsonIgnore
+	private String password;
+	
+	@OneToMany(mappedBy = "member")
+	@JsonIgnore
+	private List<MemberAddress> addressList;
+	
+	public Member() {
+	}
+
+	public Member(Integer memberId,
+			@Size(min = 2, message = "First Name should atleast contain 2 characters") String firstName,
+			String middleName, @Size(min = 2) String lastName, @Past LocalDate dateOfBirth, String occupation,
+			String mobileNumber, String email, String password) {
 		super();
 		this.memberId = memberId;
 		this.firstName = firstName;
@@ -30,13 +79,9 @@ public class Member {
 		this.lastName = lastName;
 		this.dateOfBirth = dateOfBirth;
 		this.occupation = occupation;
-		this.permanentAddress = permanentAddress;
-		this.currentAddress = currentAddress;
-		this.isCurrentAddressPermanent = isCurrentAddressPermanent;
-	}
-	
-	public Member() {
-		// TODO Auto-generated constructor stub
+		this.mobileNumber = mobileNumber;
+		this.email = email;
+		this.password = password;
 	}
 
 	public Integer getMemberId() {
@@ -75,31 +120,38 @@ public class Member {
 	public void setOccupation(String occupation) {
 		this.occupation = occupation;
 	}
-	public MemberAddress getPermanentAddress() {
-		return permanentAddress;
+	public String getMobileNumber() {
+		return mobileNumber;
 	}
-	public void setPermanentAddress(MemberAddress permanentAddress) {
-		this.permanentAddress = permanentAddress;
+	public void setMobileNumber(String mobileNumber) {
+		this.mobileNumber = mobileNumber;
 	}
-	public MemberAddress getCurrentAddress() {
-		return currentAddress;
+	public String getEmail() {
+		return email;
 	}
-	public void setCurrentAddress(MemberAddress currentAddress) {
-		this.currentAddress = currentAddress;
+	public void setEmail(String email) {
+		this.email = email;
 	}
-	public boolean isCurrentAddressPermanent() {
-		return isCurrentAddressPermanent;
+	public String getPassword() {
+		return password;
 	}
-	public void setCurrentAddressPermanent(boolean isCurrentAddressPermanent) {
-		this.isCurrentAddressPermanent = isCurrentAddressPermanent;
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public List<MemberAddress> getAddressList() {
+		return addressList;
+	}
+
+	public void setAddressList(List<MemberAddress> addressList) {
+		this.addressList = addressList;
 	}
 
 	@Override
 	public String toString() {
 		return "Member [memberId=" + memberId + ", firstName=" + firstName + ", middleName=" + middleName
 				+ ", lastName=" + lastName + ", dateOfBirth=" + dateOfBirth + ", occupation=" + occupation
-				+ ", permanentAddress=" + permanentAddress + ", currentAddress=" + currentAddress
-				+ ", isCurrentAddressPermanent=" + isCurrentAddressPermanent + "]";
+				+ ", mobileNumber=" + mobileNumber + ", email=" + email + ", password=" + password + "]";
 	}
+
 
 }

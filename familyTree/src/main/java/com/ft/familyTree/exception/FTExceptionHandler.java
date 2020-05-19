@@ -28,8 +28,8 @@ public class FTExceptionHandler extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<Object>(exception, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@ExceptionHandler(UserNotFoundException.class)
-	public final ResponseEntity<Object> handleNotFoundExceptions (UserNotFoundException ex, WebRequest request) throws Exception { 
+	@ExceptionHandler(NotFoundException.class)
+	public final ResponseEntity<Object> handleNotFoundExceptions (NotFoundException ex, WebRequest request) throws Exception { 
 		FTApplicationException exception = new FTApplicationException(LocalDateTime.now(), ex.getMessage(),
 				request.getDescription(false), Boolean.FALSE);
 		return new ResponseEntity<Object>(exception, HttpStatus.NOT_FOUND);

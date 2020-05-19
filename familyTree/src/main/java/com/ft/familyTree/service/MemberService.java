@@ -1,31 +1,34 @@
 package com.ft.familyTree.service;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ft.familyTree.dto.Member;
-import com.ft.familyTree.dto.MemberAddress;
+import com.ft.familyTree.exception.NotFoundException;
+import com.ft.familyTree.repository.MemberRepository;
 
 @Component
+@Transactional
 public class MemberService {
+	
+	private Logger vlog;
 
-	private static List<Member> members = new ArrayList<>();
-	private static int noOfMembers = 2;
-	static {
-		members.add(new Member(1, "PRATAP", "TRIVEDI", "BICCAVOLE", LocalDate.of(1991,2,5), "SOFTWARE EMPLOYEE", new MemberAddress("ad1","A5", "Latha Residency", "Manjunatha Layout", "4", "Near Saibaba Temple", "Munnekolala", "Bengaluru", "Karnataka", "India", "560037"), null, Boolean.FALSE));
-		members.add(new Member(2, "LAKSHMI", "GAYATRI", "BICCAVOLE", LocalDate.of(1992,2,14), "SOFTWARE EMPLOYEE", new MemberAddress("ad2","A5", "Latha Residency", "Manjunatha Layout", "4", "Near Saibaba Temple", "Munnekolala", "Bengaluru", "Karnataka", "India", "560037"), null, Boolean.FALSE));
-	}
+	@Autowired
+	private MemberRepository memberRepo;
 	
 	/**
 	 * This method returns all the members registered.
 	 * @return List of members.
 	 */
 	public Optional<List<Member>> fetchAllMembers() {
-		return Optional.ofNullable(members);
+		vlog.info("Fetching all members");
+		return Optional.ofNullable(memberRepo.findAll());
 	}
 	
 	/**
@@ -34,11 +37,8 @@ public class MemberService {
 	 * @return same member registered.
 	 */
 	public Optional<Member> registerMember(Member pMember) {
-		if(pMember.getMemberId() == null) {
-			pMember.setMemberId(++noOfMembers);
-		}
-		members.add(pMember);
-		Optional<Member> opt = Optional.ofNullable(pMember);
+		Optional<Member> opt = Optional.ofNullable(memberRepo.save(pMember));
+		vlog.info("New member created with id : "+ opt.get().getMemberId());
 		return opt;
 	}
 	
@@ -47,9 +47,13 @@ public class MemberService {
 	 * @param id - id.
 	 * @return member for the given id.
 	 */
-	public Member fetchMember(int id) {
-		Member member = members.stream().filter(y -> y.getMemberId() == id).findAny().orElse(null);
-		return member;
+	public Member fetchMember(int memberId) {
+		Optional<Member> member = memberRepo.findById(memberId);
+		if (!member.isPresent()) {
+			vlog.info("Member not found for the id : " + memberId);
+			throw new NotFoundException("Member not found for the id : " + memberId);
+		}
+		return member.get();
 	}
 	
 	/**
@@ -58,10 +62,24 @@ public class MemberService {
 	 * @return true if user identified and removed. Else throw UserNotFoundException.
 	 */
 	public boolean removeMember(int id) {
-		int noOfMembersBefore = noOfMembers;
-		members.removeIf(x -> x.getMemberId() == id);
-		noOfMembers = members.size();
-		boolean result = noOfMembersBefore > noOfMembers;
-		return result;
+		Optional<Member> member = memberRepo.findById(id);
+		if (!member.isPresent()) {
+			vlog.info("No member found for the id : "+id);
+			return Boolean.FALSE;
+		}
+		memberRepo.deleteById(id);
+		vlog.info("Member deleted from DB with id : "+id);
+		return Boolean.TRUE;
+	}
+	
+	/**
+	 * This method updates member in family tree.
+	 * @param pMember - pMember.
+	 * @return same member updated.
+	 */
+	public Optional<Member> updateMember(Member pMember) {
+		Optional<Member> opt = Optional.ofNullable(memberRepo.save(pMember));
+		opt.ifPresent(n -> vlog.info("Member updated with id : "+ opt.get().getMemberId()));
+		return opt;
 	}
 }
