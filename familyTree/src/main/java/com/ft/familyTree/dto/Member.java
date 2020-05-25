@@ -58,7 +58,6 @@ public class Member {
 	
 	@Size(min = 4, message = "Password should contain minimum 4 characters")
 	@Column(name = "password")
-	@JsonIgnore
 	private String password;
 	
 	@OneToMany(mappedBy = "member")
@@ -132,6 +131,7 @@ public class Member {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+	
 	public String getPassword() {
 		return password;
 	}

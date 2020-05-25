@@ -7,6 +7,7 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ import com.ft.familyTree.service.MemberService;
 @RequestMapping("/api/v2/manageMember")
 public class FamilyMembersController {
 	
-	private Logger vlog;
+	final static Logger vlog = LoggerFactory.getLogger(FamilyMembersController.class);
 	
 	@Autowired
 	MemberService memberService;

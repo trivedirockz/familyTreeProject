@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,11 +14,14 @@ import com.ft.familyTree.dto.Member;
 import com.ft.familyTree.exception.NotFoundException;
 import com.ft.familyTree.repository.MemberRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
 @Transactional
+@Slf4j
 public class MemberService {
 	
-	private Logger vlog;
+	final static Logger vlog = LoggerFactory.getLogger(MemberService.class);
 
 	@Autowired
 	private MemberRepository memberRepo;
